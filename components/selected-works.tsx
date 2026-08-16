@@ -1,5 +1,6 @@
 "use client"
 import { useRef, useState, useEffect, useCallback, memo } from "react"
+
 type Work = {
   title: string
   category: string
@@ -10,7 +11,9 @@ type Work = {
   className: string
   aspect: string
 }
+
 const BASE = 'https://pub-b325cd7755c74afeb7bad689e6c2a752.r2.dev'
+
 const works: Work[] = [
   {
     title: 'Yung Lean Documentary',
@@ -52,19 +55,19 @@ const works: Work[] = [
     className: 'md:col-span-1',
     aspect: 'aspect-[9/16]',
   },
-
 ]
+
 // ─── Icons ────────────────────────────────────────────────────────────────────
 function IconPlay() {
   return (
-    <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor">
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor" aria-hidden="true">
       <path d="M3 2.5l10 5-10 5z" />
     </svg>
   )
 }
 function IconPause() {
   return (
-    <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor">
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor" aria-hidden="true">
       <rect x="3" y="2" width="3" height="11" rx="1" />
       <rect x="9" y="2" width="3" height="11" rx="1" />
     </svg>
@@ -72,7 +75,7 @@ function IconPause() {
 }
 function IconVolume() {
   return (
-    <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor">
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor" aria-hidden="true">
       <path d="M2.5 5.5H5l3.5-3v10l-3.5-3H2.5v-4z" />
       <path d="M10.5 4.5a4 4 0 010 6" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" />
     </svg>
@@ -80,7 +83,7 @@ function IconVolume() {
 }
 function IconMute() {
   return (
-    <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor">
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="currentColor" aria-hidden="true">
       <path d="M2.5 5.5H5l3.5-3v10l-3.5-3H2.5v-4z" />
       <path d="M11 5.5l2.5 4M13.5 5.5L11 9.5" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" />
     </svg>
@@ -88,45 +91,59 @@ function IconMute() {
 }
 function IconFullscreen() {
   return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
       <path d="M1 4.5V1h3.5M9.5 1H13v3.5M13 9.5V13H9.5M4.5 13H1V9.5" />
     </svg>
   )
 }
 function IconExitFullscreen() {
   return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" aria-hidden="true">
       <path d="M4.5 1v3.5H1M9.5 1v3.5H13M9.5 13V9.5H13M4.5 13V9.5H1" />
     </svg>
   )
 }
+
 function fmt(s: number) {
   if (!isFinite(s)) return '0:00'
   const m = Math.floor(s / 60)
   const sec = Math.floor(s % 60)
   return `${m}:${sec.toString().padStart(2, '0')}`
 }
+
 // ─── Custom Video Player ──────────────────────────────────────────────────────
-function VideoPlayer({ src, poster }: { src: string; poster: string }) {
+function VideoPlayer({
+  src,
+  poster,
+  fill = false,
+}: {
+  src: string
+  poster: string
+  /** Stretches the player to fill its parent's height instead of sizing off its own width (used for vertical/portrait clips in the modal). */
+  fill?: boolean
+}) {
   const videoRef       = useRef<HTMLVideoElement>(null)
-  const containerRef   = useRef<HTMLDivElement>(null)
-  const barRef         = useRef<HTMLDivElement>(null)
-  const ctrlOverlayRef = useRef<HTMLDivElement>(null)
-  const hideTimerRef   = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
-  const rafRef         = useRef<number | undefined>(undefined)
-  const moveRafRef     = useRef<number | undefined>(undefined)
-  const isPlayingRef   = useRef(false)
+  const containerRef    = useRef<HTMLDivElement>(null)
+  const barRef          = useRef<HTMLDivElement>(null)
+  const ctrlOverlayRef  = useRef<HTMLDivElement>(null)
+  const hideTimerRef    = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const rafRef          = useRef<number | undefined>(undefined)
+  const moveRafRef      = useRef<number | undefined>(undefined)
+  const isPlayingRef    = useRef(false)
+  const scrubbingRef    = useRef(false)
   const [playing, setPlaying] = useState(false)
   const [muted,   setMuted]   = useState(false)
   const [fs,      setFs]      = useState(false)
   const progressFillRef = useRef<HTMLDivElement>(null)
   const timeDisplayRef  = useRef<HTMLSpanElement>(null)
+
   const showControls = useCallback(() => {
     if (ctrlOverlayRef.current) ctrlOverlayRef.current.style.opacity = '1'
   }, [])
   const hideControls = useCallback(() => {
     if (ctrlOverlayRef.current) ctrlOverlayRef.current.style.opacity = '0'
   }, [])
+
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
@@ -134,11 +151,13 @@ function VideoPlayer({ src, poster }: { src: string; poster: string }) {
       if (err.name !== 'AbortError') console.error(err)
     })
   }, [])
+
   useEffect(() => {
     const onChange = () => setFs(!!document.fullscreenElement)
     document.addEventListener('fullscreenchange', onChange)
     return () => document.removeEventListener('fullscreenchange', onChange)
   }, [])
+
   useEffect(() => {
     return () => {
       if (rafRef.current)     cancelAnimationFrame(rafRef.current)
@@ -146,6 +165,7 @@ function VideoPlayer({ src, poster }: { src: string; poster: string }) {
       clearTimeout(hideTimerRef.current)
     }
   }, [])
+
   const nudgeControls = useCallback(() => {
     if (moveRafRef.current) return
     moveRafRef.current = requestAnimationFrame(() => {
@@ -157,17 +177,20 @@ function VideoPlayer({ src, poster }: { src: string; poster: string }) {
       }, 2500)
     })
   }, [showControls, hideControls])
+
   const togglePlay = useCallback(() => {
     const v = videoRef.current
     if (!v) return
     v.paused ? v.play() : v.pause()
   }, [])
+
   const toggleMute = useCallback(() => {
     const v = videoRef.current
     if (!v) return
     v.muted = !v.muted
     setMuted(v.muted)
   }, [])
+
   const toggleFs = useCallback(async () => {
     try {
       if (!document.fullscreenElement) {
@@ -179,28 +202,54 @@ function VideoPlayer({ src, poster }: { src: string; poster: string }) {
       // blocked in iframe previews — fine on production
     }
   }, [])
-  const seek = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+
+  // Shared seek logic used by both click and drag scrubbing.
+  const seekFromClientX = useCallback((clientX: number) => {
     const v   = videoRef.current
     const bar = barRef.current
     if (!v || !bar || !isFinite(v.duration)) return
-    const pct = Math.max(0, Math.min(1, (e.clientX - bar.getBoundingClientRect().left) / bar.offsetWidth))
+    const rect = bar.getBoundingClientRect()
+    const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width))
     v.currentTime = pct * v.duration
+    // Update the bar instantly instead of waiting for the next 'timeupdate' event.
+    if (progressFillRef.current) progressFillRef.current.style.width = `${pct * 100}%`
   }, [])
+
+  const handleBarPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    scrubbingRef.current = true
+    barRef.current?.setPointerCapture(e.pointerId)
+    seekFromClientX(e.clientX)
+  }, [seekFromClientX])
+
+  const handleBarPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!scrubbingRef.current) return
+    seekFromClientX(e.clientX)
+  }, [seekFromClientX])
+
+  const handleBarPointerUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    scrubbingRef.current = false
+    barRef.current?.releasePointerCapture(e.pointerId)
+  }, [])
+
   const handleTimeUpdate = useCallback(() => {
     if (rafRef.current) return
     rafRef.current = requestAnimationFrame(() => {
       rafRef.current = undefined
       const v = videoRef.current
       if (!v || !isFinite(v.duration)) return
-      const pct = (v.currentTime / v.duration) * 100
-      if (progressFillRef.current) progressFillRef.current.style.width = `${pct}%`
-      if (timeDisplayRef.current)  timeDisplayRef.current.textContent  = `${fmt(v.currentTime)} / ${fmt(v.duration)}`
+      // Skip bar updates while the user is actively dragging it.
+      if (!scrubbingRef.current) {
+        const pct = (v.currentTime / v.duration) * 100
+        if (progressFillRef.current) progressFillRef.current.style.width = `${pct}%`
+      }
+      if (timeDisplayRef.current) timeDisplayRef.current.textContent = `${fmt(v.currentTime)} / ${fmt(v.duration)}`
     })
   }, [])
+
   return (
     <div
       ref={containerRef}
-      className="relative overflow-hidden rounded-xl bg-black ring-1 ring-white/10 cursor-none"
+      className={`relative overflow-hidden rounded-xl bg-black ring-1 ring-white/10 cursor-none ${fill ? 'h-full' : ''}`}
       onMouseMove={nudgeControls}
       onMouseLeave={() => {
         clearTimeout(hideTimerRef.current)
@@ -213,7 +262,7 @@ function VideoPlayer({ src, poster }: { src: string; poster: string }) {
         poster={poster}
         playsInline
         preload="auto"
-        className="block w-full cursor-none"
+        className={`block cursor-none ${fill ? 'h-full w-full object-contain' : 'w-full'}`}
         onClick={togglePlay}
         onPlay={() => {
           isPlayingRef.current = true
@@ -231,6 +280,7 @@ function VideoPlayer({ src, poster }: { src: string; poster: string }) {
           if (v && timeDisplayRef.current) timeDisplayRef.current.textContent = `0:00 / ${fmt(v.duration)}`
         }}
       />
+
       {/* Controls overlay */}
       <div
         ref={ctrlOverlayRef}
@@ -241,28 +291,44 @@ function VideoPlayer({ src, poster }: { src: string; poster: string }) {
           paddingTop: '56px',
         }}
       >
-        {/* Scrubber */}
+        {/* Scrubber — supports click-to-seek and drag (mouse + touch via Pointer Events) */}
         <div
           ref={barRef}
-          className="mx-4 mb-2.5 h-[3px] rounded-full bg-white/20 cursor-none pointer-events-auto hover:h-[5px] transition-[height] duration-150"
-          onClick={seek}
+          className="mx-4 mb-2.5 h-[3px] touch-none select-none rounded-full bg-white/20 cursor-none pointer-events-auto hover:h-[5px] transition-[height] duration-150"
+          onPointerDown={handleBarPointerDown}
+          onPointerMove={handleBarPointerMove}
+          onPointerUp={handleBarPointerUp}
+          onPointerCancel={handleBarPointerUp}
         >
           <div ref={progressFillRef} className="h-full rounded-full bg-white" style={{ width: '0%' }} />
         </div>
+
         {/* Buttons row */}
         <div className="flex items-center justify-between px-4 pb-4 pointer-events-auto">
           <div className="flex items-center gap-4">
-            <button onClick={togglePlay} className="text-white/75 hover:text-white transition-colors">
+            <button
+              onClick={togglePlay}
+              aria-label={playing ? 'Pause' : 'Play'}
+              className="text-white/75 hover:text-white transition-colors"
+            >
               {playing ? <IconPause /> : <IconPlay />}
             </button>
             <span ref={timeDisplayRef} className="font-mono text-[10px] tabular-nums text-white/45 select-none">
               0:00 / 0:00
             </span>
-            <button onClick={toggleMute} className="text-white/75 hover:text-white transition-colors">
+            <button
+              onClick={toggleMute}
+              aria-label={muted ? 'Unmute' : 'Mute'}
+              className="text-white/75 hover:text-white transition-colors"
+            >
               {muted ? <IconMute /> : <IconVolume />}
             </button>
           </div>
-          <button onClick={toggleFs} className="text-white/75 hover:text-white transition-colors">
+          <button
+            onClick={toggleFs}
+            aria-label={fs ? 'Exit fullscreen' : 'Enter fullscreen'}
+            className="text-white/75 hover:text-white transition-colors"
+          >
             {fs ? <IconExitFullscreen /> : <IconFullscreen />}
           </button>
         </div>
@@ -270,6 +336,7 @@ function VideoPlayer({ src, poster }: { src: string; poster: string }) {
     </div>
   )
 }
+
 // ─── Modal ────────────────────────────────────────────────────────────────────
 function WorkModal({ work, onClose }: { work: Work; onClose: () => void }) {
   const [visible, setVisible] = useState(false)
@@ -279,10 +346,20 @@ function WorkModal({ work, onClose }: { work: Work; onClose: () => void }) {
     const raf = requestAnimationFrame(() => setVisible(true))
     return () => cancelAnimationFrame(raf)
   }, [])
+
   useEffect(() => {
+    // Lock scroll and compensate for the scrollbar width so the page doesn't shift.
+    const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth
+    const prevOverflow = document.body.style.overflow
+    const prevPaddingRight = document.body.style.paddingRight
     document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = '' }
+    if (scrollBarWidth > 0) document.body.style.paddingRight = `${scrollBarWidth}px`
+    return () => {
+      document.body.style.overflow = prevOverflow
+      document.body.style.paddingRight = prevPaddingRight
+    }
   }, [])
+
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', onKey)
@@ -291,6 +368,9 @@ function WorkModal({ work, onClose }: { work: Work; onClose: () => void }) {
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={work.title}
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4 sm:p-6 cursor-none"
       style={{
         backgroundColor: visible ? 'rgba(0,0,0,0.88)' : 'rgba(0,0,0,0)',
@@ -299,7 +379,7 @@ function WorkModal({ work, onClose }: { work: Work; onClose: () => void }) {
       onClick={onClose}
     >
       <div
-        className={`relative w-full cursor-none my-auto ${isVertical ? 'max-w-3xl' : 'max-w-6xl'}`}
+        className={`relative w-full cursor-none my-auto ${isVertical ? 'max-w-4xl' : 'max-w-6xl'}`}
         style={{
           opacity: visible ? 1 : 0,
           transform: visible ? 'translateY(0)' : 'translateY(16px)',
@@ -311,21 +391,23 @@ function WorkModal({ work, onClose }: { work: Work; onClose: () => void }) {
         <div className="mb-3 flex justify-end">
           <button
             onClick={onClose}
+            aria-label="Close preview"
             className="flex items-center gap-2 text-white/40 hover:text-white transition-colors duration-200 text-[10px] uppercase tracking-[0.25em]"
           >
             Close
-            <svg width="11" height="11" viewBox="0 0 11 11" fill="none">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
               <path d="M1 1l9 9M10 1L1 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
             </svg>
           </button>
         </div>
 
         {isVertical ? (
-          <div className="flex flex-row gap-8 items-start">
-            <div className="w-[280px] shrink-0">
-              {work.video && <VideoPlayer src={work.video} poster={work.poster} />}
+          <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:justify-center sm:gap-10">
+            {/* Height-driven; width is derived from the 9:16 ratio, so it never overflows the viewport */}
+            <div className="relative h-[58vh] w-auto shrink-0 aspect-[9/16] sm:h-[80vh] sm:max-h-[840px]">
+              {work.video && <VideoPlayer src={work.video} poster={work.poster} fill />}
             </div>
-            <div className="flex flex-col gap-3 pt-2 flex-1">
+            <div className="flex w-full flex-col gap-3 text-center sm:w-72 sm:text-left">
               <p className="text-[10px] font-medium uppercase tracking-[0.3em] text-white/35">
                 {work.category}
               </p>
@@ -335,7 +417,7 @@ function WorkModal({ work, onClose }: { work: Work; onClose: () => void }) {
               <p className="mt-2 text-sm leading-relaxed text-white/55">
                 {work.description}
               </p>
-              <span className="font-mono text-xs text-white/30 mt-auto">{work.year}</span>
+              <span className="font-mono text-xs text-white/30 sm:mt-auto">{work.year}</span>
             </div>
           </div>
         ) : (
@@ -361,9 +443,10 @@ function WorkModal({ work, onClose }: { work: Work; onClose: () => void }) {
     </div>
   )
 }
+
 // ─── Card ─────────────────────────────────────────────────────────────────────
 const WorkCard = memo(function WorkCard({ work, onOpen }: { work: Work; onOpen: (w: Work) => void }) {
-  const videoRef      = useRef<HTMLVideoElement>(null)
+  const videoRef       = useRef<HTMLVideoElement>(null)
   const playPromiseRef = useRef<Promise<void> | undefined>(undefined)
 
   const handleMouseEnter = useCallback(() => {
@@ -381,6 +464,7 @@ const WorkCard = memo(function WorkCard({ work, onOpen }: { work: Work; onOpen: 
   }, [])
 
   const handleClick = useCallback(() => onOpen(work), [onOpen, work])
+
   return (
     <article
       className={`group relative cursor-none overflow-hidden rounded-xl border border-border bg-card ${work.className}`}
@@ -393,6 +477,7 @@ const WorkCard = memo(function WorkCard({ work, onOpen }: { work: Work; onOpen: 
           src={work.poster}
           alt={`${work.title} — ${work.category}`}
           loading="lazy"
+          decoding="async"
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
         />
         {work.video && (
@@ -407,15 +492,17 @@ const WorkCard = memo(function WorkCard({ work, onOpen }: { work: Work; onOpen: 
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
+
         {/* Watch pill */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
           <div className="flex items-center gap-2 rounded-full border border-white/20 bg-black/50 px-4 py-2">
-            <svg width="11" height="11" viewBox="0 0 11 11" fill="white">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="white" aria-hidden="true">
               <path d="M2.5 1.5l8 4-8 4z" />
             </svg>
             <span className="text-[10px] font-medium uppercase tracking-[0.2em] text-white">Watch</span>
           </div>
         </div>
+
         <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-5">
           <div>
             <h3 className="text-lg font-semibold tracking-tight text-white">{work.title}</h3>
@@ -427,11 +514,13 @@ const WorkCard = memo(function WorkCard({ work, onOpen }: { work: Work; onOpen: 
     </article>
   )
 })
+
 // ─── Section ──────────────────────────────────────────────────────────────────
 export function SelectedWorks() {
   const [selected, setSelected] = useState<Work | null>(null)
   const handleOpen  = useCallback((work: Work) => setSelected(work), [])
   const handleClose = useCallback(() => setSelected(null), [])
+
   return (
     <section id="portfolio" className="mx-auto max-w-7xl px-6 py-28 lg:px-8">
       <div className="mb-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -448,11 +537,13 @@ export function SelectedWorks() {
           campaigns that demand attention.
         </p>
       </div>
+
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {works.map((work) => (
           <WorkCard key={work.title} work={work} onOpen={handleOpen} />
         ))}
       </div>
+
       {selected && (
         <WorkModal work={selected} onClose={handleClose} />
       )}

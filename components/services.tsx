@@ -22,25 +22,25 @@ const services = [
   },
   {
     no: '03',
+    title: 'UI/UX Design',
+    icon: Sparkles,
+    desc: 'Interface systems and user flows — wireframe to high-fidelity prototype in Figma.',
+  },
+  {
+    no: '04',
     title: 'Retention & Conversion',
     icon: Layers,
     desc: 'Content engineered to maximize watch time and convert - from paid ads to long-form commercial content.',
   },
   {
-    no: '04',
-    title: 'Color Grading',
-    icon: Sparkles,
-    desc: 'Mood-first grading - shot consistency, deepened atmosphere, that makes every frame feel intentional.',
-  },
-  {
     no: '05',
     title: 'Social Content',
     icon: Share2,
-    desc: 'Short-form vertical edits and performative creatives designed to stop the scroll and drive engagement.',
+    desc: 'Short-form performative creatives including TikTok and Meta designed to stop the scroll, drive engagement and sell the product.',
   },
   {
     no: '06',
-    title: 'Creative Direction',
+    title: 'Creative Direction & Performance Oriented Strategy',
     icon: Compass,
     desc: 'Concept to delivery - shaping the visual language behind the whole piece.',
   },

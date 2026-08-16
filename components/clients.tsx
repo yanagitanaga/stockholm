@@ -1,8 +1,8 @@
 const clients = [
   { name: 'Оскар Хартманн', subs: '590K', niche: 'Business', platform: 'YouTube' },
   { name: 'Дмитрий Кокорев', subs: '121K', niche: 'Finance', platform: 'YouTube' },
-  { name: 'Живой Путь', subs: '30K', niche: 'Finance', platform: 'YouTube' },
-  { name: 'Живой Трейдер', subs: '22K', niche: 'Finance', platform: 'YouTube' },
+  { name: 'Живой Путь', subs: '30K', niche: 'Finance', platform: 'Meta' },
+  { name: 'Живой Трейдер', subs: '22K', niche: 'Finance', platform: 'Meta' },
   { name: 'Movies Explained', subs: '86K', niche: 'Movies', platform: 'YouTube' },
   { name: 'Music Explained', subs: '15K', niche: 'Music', platform: 'YouTube' },
   { name: 'Rap Thread', subs: '42K', niche: 'Music', platform: 'YouTube' },
@@ -11,8 +11,8 @@ const clients = [
   { name: 'irwwwin', subs: '68K', niche: 'Movies', platform: 'YouTube' },
   { name: 'ADDIS', subs: '3K', niche: 'Entertainment Show', platform: 'YouTube' },
   { name: 'ESN Golf', subs: '35K', niche: 'Sports', platform: 'YouTube' },
-  { name: 'yuri.ai', subs: '92K', niche: 'Technologies / AI', platform: 'Instagram' },
-  { name: 'dvdnl', subs: '9K', niche: 'Fashion & Style', platform: 'Instagram' },
+  { name: 'yuri.ai', subs: '92K', niche: 'Technologies / AI', platform: 'Meta' },
+  { name: 'dvdnl', subs: '9K', niche: 'Fashion & Style', platform: 'Meta' },
   { name: 'makeichyk', subs: '2K', niche: 'Real Estate', platform: 'TikTok' },
   { name: 'мелоч', subs: '143K', niche: 'Entertainment', platform: 'YouTube' },
 ]
