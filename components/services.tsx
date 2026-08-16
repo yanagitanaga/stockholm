@@ -22,7 +22,7 @@ const services = [
   },
   {
     no: '03',
-    title: 'UI/UX Design',
+    title: 'UX/UI Design',
     icon: Sparkles,
     desc: 'Interface systems and user flows — wireframe to high-fidelity prototype in Figma.',
   },
@@ -40,7 +40,7 @@ const services = [
   },
   {
     no: '06',
-    title: 'Creative Direction & Performance Oriented Strategy',
+    title: 'Creative Direction',
     icon: Compass,
     desc: 'Concept to delivery - shaping the visual language behind the whole piece.',
   },
