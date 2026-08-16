@@ -47,7 +47,7 @@ const works: Work[] = [
   },
   {
     title: 'Luxury Villa Tour',
-    category: 'Real Estate Content',
+    category: 'Advertising Creative',
     year: '2026',
     description: 'A client project showcasing a luxury villa — architectural details, interiors, and atmosphere captured on camera.',
     poster: `${BASE}/preview_04.png`,
