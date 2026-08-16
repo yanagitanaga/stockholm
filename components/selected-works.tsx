@@ -52,16 +52,7 @@ const works: Work[] = [
     className: 'md:col-span-1',
     aspect: 'aspect-[9/16]',
   },
-  {
-    title: 'Dean Blunt Documentary',
-    category: 'Documentary',
-    year: '2024',
-    description: 'I tried to find out who Dean Blunt is. He made sure I couldn`t',
-    poster: `${BASE}/preview_05.png`,
-    video: `${BASE}/02_Dean_Blunt.mp4`,
-    className: 'md:col-span-3',
-    aspect: 'aspect-[16/9]',
-  },
+
 ]
 // ─── Icons ────────────────────────────────────────────────────────────────────
 function IconPlay() {
@@ -121,9 +112,9 @@ function VideoPlayer({ src, poster }: { src: string; poster: string }) {
   const containerRef   = useRef<HTMLDivElement>(null)
   const barRef         = useRef<HTMLDivElement>(null)
   const ctrlOverlayRef = useRef<HTMLDivElement>(null)
-  const hideTimerRef   = useRef<ReturnType<typeof setTimeout>>()
-  const rafRef         = useRef<number>()
-  const moveRafRef     = useRef<number>()
+  const hideTimerRef   = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
+  const rafRef         = useRef<number | undefined>(undefined)
+  const moveRafRef     = useRef<number | undefined>(undefined)
   const isPlayingRef   = useRef(false)
   const [playing, setPlaying] = useState(false)
   const [muted,   setMuted]   = useState(false)
@@ -136,7 +127,6 @@ function VideoPlayer({ src, poster }: { src: string; poster: string }) {
   const hideControls = useCallback(() => {
     if (ctrlOverlayRef.current) ctrlOverlayRef.current.style.opacity = '0'
   }, [])
-  // FIX: ignore AbortError, no cleanup needed — browser handles it on unmount
   useEffect(() => {
     const video = videoRef.current
     if (!video) return
@@ -222,6 +212,7 @@ function VideoPlayer({ src, poster }: { src: string; poster: string }) {
         src={src}
         poster={poster}
         playsInline
+        preload="auto"
         className="block w-full cursor-none"
         onClick={togglePlay}
         onPlay={() => {
@@ -297,6 +288,7 @@ function WorkModal({ work, onClose }: { work: Work; onClose: () => void }) {
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [onClose])
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4 sm:p-6 cursor-none"
@@ -307,7 +299,7 @@ function WorkModal({ work, onClose }: { work: Work; onClose: () => void }) {
       onClick={onClose}
     >
       <div
-        className={`relative w-full cursor-none my-auto ${isVertical ? 'max-w-[380px]' : 'max-w-6xl'}`}
+        className={`relative w-full cursor-none my-auto ${isVertical ? 'max-w-3xl' : 'max-w-6xl'}`}
         style={{
           opacity: visible ? 1 : 0,
           transform: visible ? 'translateY(0)' : 'translateY(16px)',
@@ -327,23 +319,44 @@ function WorkModal({ work, onClose }: { work: Work; onClose: () => void }) {
             </svg>
           </button>
         </div>
-        {/* Player */}
-        {work.video && <VideoPlayer src={work.video} poster={work.poster} />}
-        {/* Info */}
-        <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div className="flex-1">
-            <p className="mb-1.5 text-[10px] font-medium uppercase tracking-[0.3em] text-white/35">
-              {work.category}
-            </p>
-            <h3 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
-              {work.title}
-            </h3>
-            <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/55">
-              {work.description}
-            </p>
+
+        {isVertical ? (
+          <div className="flex flex-row gap-8 items-start">
+            <div className="w-[280px] shrink-0">
+              {work.video && <VideoPlayer src={work.video} poster={work.poster} />}
+            </div>
+            <div className="flex flex-col gap-3 pt-2 flex-1">
+              <p className="text-[10px] font-medium uppercase tracking-[0.3em] text-white/35">
+                {work.category}
+              </p>
+              <h3 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
+                {work.title}
+              </h3>
+              <p className="mt-2 text-sm leading-relaxed text-white/55">
+                {work.description}
+              </p>
+              <span className="font-mono text-xs text-white/30 mt-auto">{work.year}</span>
+            </div>
           </div>
-          <span className="font-mono text-xs text-white/30 sm:mt-1 shrink-0">{work.year}</span>
-        </div>
+        ) : (
+          <>
+            {work.video && <VideoPlayer src={work.video} poster={work.poster} />}
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex-1">
+                <p className="mb-1.5 text-[10px] font-medium uppercase tracking-[0.3em] text-white/35">
+                  {work.category}
+                </p>
+                <h3 className="text-xl font-bold tracking-tight text-white sm:text-2xl">
+                  {work.title}
+                </h3>
+                <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/55">
+                  {work.description}
+                </p>
+              </div>
+              <span className="font-mono text-xs text-white/30 sm:mt-1 shrink-0">{work.year}</span>
+            </div>
+          </>
+        )}
       </div>
     </div>
   )
@@ -351,8 +364,7 @@ function WorkModal({ work, onClose }: { work: Work; onClose: () => void }) {
 // ─── Card ─────────────────────────────────────────────────────────────────────
 const WorkCard = memo(function WorkCard({ work, onOpen }: { work: Work; onOpen: (w: Work) => void }) {
   const videoRef      = useRef<HTMLVideoElement>(null)
-  // FIX: track play promise to avoid AbortError on fast hover-out
-  const playPromiseRef = useRef<Promise<void> | undefined>()
+  const playPromiseRef = useRef<Promise<void> | undefined>(undefined)
 
   const handleMouseEnter = useCallback(() => {
     playPromiseRef.current = videoRef.current?.play() ?? undefined
